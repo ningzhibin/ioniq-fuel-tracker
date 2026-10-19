@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ioniq Fuel Tracker — 7 years of real-world hybrid fuel economy</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
   body{font-family:-apple-system,system-ui,"Segoe UI",Roboto,sans-serif;max-width:980px;margin:0 auto;padding:20px;color:#222;background:#fafafa}
   h1{font-size:1.6em;margin-bottom:0} .sub{color:#666;margin:4px 0 20px}
@@ -68,7 +69,7 @@ document.getElementById('cards').innerHTML = cards.map(c =>
 document.getElementById('slope').textContent = (s.slope_10k >= 0 ? '+' : '') + s.slope_10k;
 
 const pts = D.records.filter(r => r.eff).map(r => ({x: r.date, y: r.eff}));
-new Chart(c1, {type: 'scatter',
+new Chart(document.getElementById('c1'), {type: 'scatter',
   data: {datasets: [
     {label: 'per fill-up', data: pts, pointRadius: 3, backgroundColor: '#1a73e880'},
     {label: '5-fill rolling avg', type: 'line', data: D.rolling.map(p => ({x: p.date, y: p.v})),
@@ -76,17 +77,17 @@ new Chart(c1, {type: 'scatter',
   options: {scales: {x: {type: 'time', time: {unit: 'year'}}, y: {title: {display: true, text: 'L/100 km'}}}, plugins: {legend: {display: true}}}});
 
 const order = ['Winter', 'Spring', 'Summer', 'Fall'];
-new Chart(c2, {type: 'bar',
+new Chart(document.getElementById('c2'), {type: 'bar',
   data: {labels: order, datasets: [{data: order.map(k => D.seasonal[k]),
     backgroundColor: ['#8ab4f8', '#81c995', '#fdd663', '#f6aea9']}]},
   options: {scales: {y: {title: {display: true, text: 'L/100 km'}}}, plugins: {legend: {display: false}}}});
 
-new Chart(c3, {type: 'scatter',
+new Chart(document.getElementById('c3'), {type: 'scatter',
   data: {datasets: [{label: 'fill-ups', data: D.records.filter(r => r.eff && r.odo).map(r => ({x: r.odo, y: r.eff})),
     pointRadius: 3, backgroundColor: '#1a73e880'}]},
   options: {scales: {x: {title: {display: true, text: 'odometer (km)'}}, y: {title: {display: true, text: 'L/100 km'}}}, plugins: {legend: {display: false}}}});
 
-new Chart(c4, {type: 'line',
+new Chart(document.getElementById('c4'), {type: 'line',
   data: {datasets: [
     {label: 'price (CAD/L)', data: D.records.filter(r => r.price).map(r => ({x: r.date, y: r.price})),
      borderColor: '#f9ab00', pointRadius: 0, tension: 0.2, yAxisID: 'y'},
@@ -94,13 +95,12 @@ new Chart(c4, {type: 'line',
      borderColor: '#d93025', pointRadius: 0, tension: 0.2, yAxisID: 'y1'}]},
   options: {scales: {x: {type: 'time', time: {unit: 'year'}}, y: {position: 'left'}, y1: {position: 'right', grid: {drawOnChartArea: false}}}}});
 
-new Chart(c5, {type: 'bar',
+new Chart(document.getElementById('c5'), {type: 'bar',
   data: {labels: Object.keys(D.yearly), datasets: [{data: Object.values(D.yearly), backgroundColor: '#81c995'}]},
   options: {scales: {y: {title: {display: true, text: 'L/100 km'}}}, plugins: {legend: {display: false}}}});
 
 document.getElementById('recent').innerHTML = D.records.filter(r => r.litres).slice(-10).reverse().map(r =>
   `<tr><td>${r.date}</td><td>${r.litres ?? ''}</td><td>${r.price ?? ''}</td><td>${r.cost ?? ''}</td><td>${r.trip ?? ''}</td><td><b>${r.eff ?? ''}</b></td><td>${r.comment}</td></tr>`).join('');
 </script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 </body>
 </html>
